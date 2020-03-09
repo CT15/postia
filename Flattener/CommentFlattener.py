@@ -48,6 +48,7 @@ class CommentFlattener(Flattener):
 
             index += 1
 
+        combined_df.reset_index(drop=True, inplace=True)
         return combined_df
 
     @property

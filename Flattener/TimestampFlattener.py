@@ -17,6 +17,7 @@ class TimestampFlattener(Flattener):
         combined_df = pd.concat([self.post_df, self.comment_df], axis=0, sort=True, ignore_index=True)
         combined_df = combined_df.sort_values(['thread_id', 'post_time'])
         
+        combined_df.reset_index(drop=True, inplace=True)
         return combined_df
 
     @property

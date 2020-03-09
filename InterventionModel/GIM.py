@@ -36,13 +36,13 @@ class GIM(InterventionModel):
         self._labels = labels
 
 
-    def __is_gratitude_message(self, string):
-        if len(string) > 15 or '?' in string:
+    def __is_gratitude_message(self, string):    
+        if len(string.split()) > 15 or '?' in string:
             return False
 
         thank_words = set(['thank', 'Thank', 'thanks', 'Thanks'])
         
-        for word in string:
+        for word in string.split():
             if word in thank_words:
                 return True
 
