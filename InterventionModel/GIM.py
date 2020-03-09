@@ -15,7 +15,7 @@ from .InterventionModel import InterventionModel
 class GIM(InterventionModel):
     def __init__(self, user_df, post_df, instructor='Instructor', student='Student', filename='found'):
         if filename is not None and os.path.exists(f'{filename}.csv'):
-            os.remove(f'{filename}.txt')
+            os.remove(f'{filename}.csv')
 
         self.filename = filename
         self._posts = np.array(post_df.post_text)
@@ -68,7 +68,7 @@ class GIM(InterventionModel):
             if math.isnan(post):
                 print(index, post, label)
                 continue
-            
+
             if label == 1:
                 labels.append(1)
             elif label == 0:
