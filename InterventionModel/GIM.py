@@ -7,11 +7,16 @@
 # case. The text must not contain any question marks.
 
 import numpy as np
+import os
 
 from .InterventionModel import InterventionModel
 
 class GIM(InterventionModel):
-    def __init__(self, user_df, post_df, instructor='Instructor', student='Student'):
+    def __init__(self, user_df, post_df, instructor='Instructor', student='Student', filename='found'):
+        if filename is not None and os.path.exists(f'{filename}.csv'):
+            os.remove(f'{filename}.txt')
+
+        self.filename = filename
         self._posts = np.array(post_df.post_text)
         
         instructors = user_df[user_df.user_title == instructor].id
@@ -51,9 +56,13 @@ class GIM(InterventionModel):
 
     def __get_updated_labels(self):
         labels = []
-        
+
+        # to count gratitude message found
+        count = 0
         # 0 => student
         # 1 => instructor
+        prev_post = '---'
+        prev_label = -1
         for index, (post, label) in enumerate(zip(self.posts, self.labels)):
             if label == 1:
                 labels.append(1)
@@ -61,11 +70,32 @@ class GIM(InterventionModel):
                 if self.__is_gratitude_message(post) and index > 0:
                     labels.pop()
                     labels.extend([1, 0])
+                    
+                    count += 1
+
+                    if self.filename is not None:
+                        filename = f'{self.filename}.csv'
+
+                        if os.path.exists(filename):
+                            append_write = 'a'
+                        else:
+                            append_write = 'w'
+
+                        with open(filename, append_write) as myfile:
+                            myfile.write(f'{index},{post},{int(prev_label)},{prev_post}\n')
+
                 else:
                     labels.append(0)
             else:
                 raise Exception(f'The label {label} at index {index} is unrecognized.')
-        
+            
+            prev_post = post
+            prev_label = label
+
+        if self.filename is not None and os.path.exists(f'{self.filename}.csv'):
+            with open(f'{self.filename}.csv', 'a') as myfile:
+                myfile.write(f'# total = {count}')
+
         return np.array(labels)
 
     @property
