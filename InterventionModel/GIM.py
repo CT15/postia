@@ -8,6 +8,7 @@
 
 import numpy as np
 import os
+import math
 
 from .InterventionModel import InterventionModel
 
@@ -64,6 +65,10 @@ class GIM(InterventionModel):
         prev_post = '---'
         prev_label = -1
         for index, (post, label) in enumerate(zip(self.posts, self.labels)):
+            if math.isnan(post):
+                print(index, post, label)
+                continue
+            
             if label == 1:
                 labels.append(1)
             elif label == 0:
