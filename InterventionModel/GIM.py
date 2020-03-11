@@ -19,6 +19,7 @@ class GIM(InterventionModel):
 
         self.filename = filename
         self._posts = np.array(post_df.post_text)
+        self._thread_ids = np.array(post_df.thread_id)
         
         instructors = user_df[user_df.user_title == instructor].id
         students = user_df[user_df.user_title == student].id
@@ -43,16 +44,10 @@ class GIM(InterventionModel):
 
 
     def __is_gratitude_message(self, string):    
-        if len(string.split()) > 15 or '?' in string:
+        if len(string.split()) > 20 or '?' in string:
             return False
-
-        thank_words = set(['thank', 'Thank', 'thanks', 'Thanks'])
         
-        for word in string.split():
-            if word in thank_words:
-                return True
-
-        return False
+        return 'thank' in string.lower()
 
 
     def __get_updated_labels(self):
@@ -60,16 +55,19 @@ class GIM(InterventionModel):
 
         # to count gratitude message found
         count = 0
+
         # 0 => student
         # 1 => instructor
+        
         prev_post = '---'
         prev_label = -1
-        for index, (post, label) in enumerate(zip(self.posts, self.labels)):
-            print(index, post[0:50], label)
+        prev_thread_id = None
+
+        for index, (post, label, t_id) in enumerate(zip(self.posts, self.labels, self._thread_ids)):
             if label == 1:
                 labels.append(1)
             elif label == 0:
-                if self.__is_gratitude_message(post) and index > 0:
+                if self.__is_gratitude_message(post) and not self.__is_gratitude_message(prev_post) and t_id == prev_thread_id:
                     labels.pop()
                     labels.extend([1, 0])
                     
@@ -93,6 +91,7 @@ class GIM(InterventionModel):
             
             prev_post = post
             prev_label = label
+            prev_thread_id = t_id
 
         if self.filename is not None and os.path.exists(f'{self.filename}.csv'):
             with open(f'{self.filename}.csv', 'a') as myfile:
