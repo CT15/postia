@@ -9,6 +9,7 @@
 import numpy as np
 import os
 import math
+import re
 
 from .InterventionModel import InterventionModel
 
@@ -44,10 +45,15 @@ class GIM(InterventionModel):
 
 
     def __is_gratitude_message(self, string):    
-        if len(string.split()) > 20 or '?' in string:
-            return False
+        strings = re.split('[.!?]', string)
+
+        for str_ in strings:
+            if str_ > 20:
+                continue
+            if 'thank' in str_.lower():
+                return true
         
-        return 'thank' in string.lower()
+        return False
 
 
     def __get_updated_labels(self):
