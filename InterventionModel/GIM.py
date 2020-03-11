@@ -48,7 +48,7 @@ class GIM(InterventionModel):
         strings = re.split('[.!?]', string)
 
         for str_ in strings:
-            if str_ > 20:
+            if len(str_.split()) > 20:
                 continue
             if 'thank' in str_.lower():
                 return true
