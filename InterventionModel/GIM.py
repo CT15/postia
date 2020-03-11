@@ -51,7 +51,7 @@ class GIM(InterventionModel):
             if len(str_.split()) > 20:
                 continue
             if 'thank' in str_.lower():
-                return true
+                return True
         
         return False
 
